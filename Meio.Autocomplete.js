@@ -452,6 +452,11 @@ provides: [Meio.Element.List]
             listNode.setStyle('width', width == 'field' ? fieldNode.getWidth().toInt() - listNode.getStyle('border-left-width').toInt() - listNode.getStyle('border-right-width').toInt() : width);
             listNode.setPosition({x: elPosition.left, y: elPosition.bottom});
         },
+        
+        destroy: function() {
+ 		         this.detach();
+			         this.node.destroy(); // @ToDo to be save, we should not destroy it when list is shared
+		      },
 
         show: function() {
             this.node.scrollTop = 0;
@@ -524,6 +529,7 @@ provides: [Meio.Autocomplete]
             autoFocus: false,
             maxVisibleItems: 10,
             cacheType: 'shared', // 'shared' or 'own'
+            preventDefaultOnSubmit: true, // Prevent default event on input submit while autocompletion is active
 
             filter: {
                 /*
@@ -578,8 +584,9 @@ provides: [Meio.Autocomplete]
                 'beforeKeyrepeat': function(e) {
                     this.active = 1;
                     var e_key = e.key, list = this.elements.list;
-                    if (e_key == 'up' || e_key == 'down' || (e_key == 'enter' && list.showing)) e.preventDefault();
-                },
+                    if ( (this.options.preventDefaultOnSubmit && e_key == 'enter' && list.showing) || e_key == 'up' || e_key == 'down' ) {
+                        e.preventDefault();
+                    }                },
                 'delayedKeyrepeat': function(e) {
                     var e_key = e.key, field = this.elements.field;
                     field.keyPressControl[e_key] = true;
@@ -1282,7 +1289,7 @@ requires:
 
 license: MIT-style license
 
-provides: [Meio.Autocomplete.Cache]
+provides: [Meio.Autocomplete.Cache, Meio.Autocomplete.FakeCache]
 
 ...
 */

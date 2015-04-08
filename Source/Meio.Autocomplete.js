@@ -54,6 +54,7 @@ provides: [Meio.Autocomplete]
             autoFocus: false,
             maxVisibleItems: 10,
             cacheType: 'shared', // 'shared' or 'own'
+            preventDefaultOnSubmit: true, // Prevent default event on input submit while autocompletion is active
 
             filter: {
                 /*
@@ -108,8 +109,9 @@ provides: [Meio.Autocomplete]
                 'beforeKeyrepeat': function(e) {
                     this.active = 1;
                     var e_key = e.key, list = this.elements.list;
-                    if (e_key == 'up' || e_key == 'down' || (e_key == 'enter' && list.showing)) e.preventDefault();
-                },
+                    if ( (this.options.preventDefaultOnSubmit && e_key == 'enter' && list.showing) || e_key == 'up' || e_key == 'down' ) {
+                        e.preventDefault();
+                    }                },
                 'delayedKeyrepeat': function(e) {
                     var e_key = e.key, field = this.elements.field;
                     field.keyPressControl[e_key] = true;
